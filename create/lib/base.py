@@ -8,9 +8,9 @@ import os
 _cwd = os.getcwd()
 
 class Create_Installer:
-    def __init__(self, script_path, console, run_exe):
+    def __init__(self, script_path, name, console, run_exe):
         self.path = script_path
-        self.name = os.path.splitext(os.path.basename(os.path.abspath(self.path)))[0]
+        self.name = name or os.path.splitext(os.path.basename(os.path.abspath(self.path)))[0]+"-installer"
         self.console = console
         self.dist = None
         if run_exe:
@@ -33,4 +33,4 @@ class Create_Installer:
         self.zip_file = self.name+".zip"
         with zipfile.ZipFile(self.zip_file, "w", compression=zipfile.ZIP_DEFLATED) as zip:
             for f in tqdm.tqdm(self.files, desc="compressing... ", leave=True, ascii=".#"):
-                zip.write(f, arcname=f)
+                zip.write(os.path.join(target, f), arcname=f)

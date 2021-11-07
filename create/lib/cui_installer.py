@@ -1,13 +1,19 @@
 from create.lib.base import Create_Installer
+import subprocess
 
 class create(Create_Installer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
     def run(self):
-        self.run_exe()
         self.compress()
         self.make_py_file()
+        self.make_installer()
+
+    def make_installer(self):
+        cmd = ["pyinstaller", "--onefile", self.name+".py"]
+        p = subprocess.run(cmd)
+        self.is_success(p)
 
     def make_py_file(self):
         body = """import argparse
@@ -40,5 +46,5 @@ def main():
 
 if __name__== "__main__":
     main()""".format(zip_file=self.zip_file, files=self.files)
-        with open("temp.py", "w") as f:
+        with open(self.name+".py", "w") as f:
             f.write(body)
