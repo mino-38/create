@@ -26,13 +26,13 @@ class Create_Installer:
         self.dist = "dist"
         
     def _is_success(self, p):
-        if p.returncode !=0:
+        if p.returncode != 0:
             sys.exit(p.returncode)
 
     def compress(self):
         target = self.dist if self.dist else self.path
         os.chdir(target)
-        self.files = glob.glob("*")
+        self.files = glob.glob("**", recursive=True)
         os.chdir(_cwd)
         self.zip_file = self.name+".zip"
         with zipfile.ZipFile(self.zip_file, "w", compression=zipfile.ZIP_DEFLATED) as zip:
