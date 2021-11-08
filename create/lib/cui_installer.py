@@ -1,5 +1,6 @@
 from create.lib.base import Create_Installer
 import subprocess
+import sys
 
 class create_cui_installer(Create_Installer):
     def __init__(self, *args, **kwargs):
@@ -8,13 +9,8 @@ class create_cui_installer(Create_Installer):
     def run(self):
         self.compress()
         self.make_py_file()
-        self.make_installer()
-
-    def make_installer(self):
-        cmd = ["pyinstaller", "--clean", "--onefile", self.name+".py"]
-        p = subprocess.run(cmd)
-        self._is_success(p)
-
+        self.make_installer(gui=False)
+        
     def make_py_file(self):
         body = """import argparse
 import zipfile

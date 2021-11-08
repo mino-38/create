@@ -1,4 +1,5 @@
 import subprocess
+import platform
 import zipfile
 import tqdm
 import glob
@@ -13,6 +14,7 @@ class Create_Installer:
         self.name = name or os.path.splitext(os.path.basename(os.path.abspath(self.path)))[0]+"-installer"
         self.console = console
         self.dist = None
+        self._is_win = platform.system() == "Windows"
         if run_exe:
             self.make_exe()
 
@@ -34,3 +36,13 @@ class Create_Installer:
         with zipfile.ZipFile(self.zip_file, "w", compression=zipfile.ZIP_DEFLATED) as zip:
             for f in tqdm.tqdm(self.files, desc="compressing... ", leave=True, ascii=".#"):
                 zip.write(os.path.join(target, f), arcname=f)
+
+    def make_installer(self, gui=True):
+        cmd = ["pyinstaller", "--onefile", "--clean", "--add-data", "{zip}{join}{zip}".format(zip=self.zip_file, join=(";" if sys.platform == "win32" else ":"))]
+        if gui:
+            cmd.append("--noconsole")
+            if self._is_win:
+                cmd.append("--windowed")
+        cmd.append(self.name+".py")
+        p = subprocess.run(cmd)
+        self._is_success(p)

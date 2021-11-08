@@ -8,6 +8,7 @@ class create_gui_installer(Create_Installer):
     def run(self):
         self.compress()
         self.make_py_file()
+        self.make_installer()
 
     def make_py_file(self):
         body = """from tkinter import filedialog
@@ -73,4 +74,9 @@ def main():
     button2.grid(column=0, row=2)
     frame.pack()
     root.mainloop()
-        """
+
+if __name__ == "__main__":
+    main()
+        """.format(zip_file=self.zip_file, file_list=self.files, name=self.name)
+        with open(self.name+".py", "w") as f:
+            f.write(body)
