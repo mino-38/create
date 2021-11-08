@@ -22,13 +22,13 @@ def main():
         from create.lib.cui_installer import create_cui_installer as create
     else:
         from create.lib.gui_installer import create_gui_installer as create
-    setup = create(
+    with create(
         args.Script_File,
         name=args.output,
         console=args.noconsole,
         run_exe=args.exe
-    )
-    setup.run()
+    ) as installer:
+        installer.run()
 
 if __name__ == "__main__":
     sys.exit(main())
