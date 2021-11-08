@@ -19,9 +19,9 @@ def main():
         print("{} does not exists".format(args.Script_File))
         return 1
     if args.cui:
-        from create.lib.cui_installer import create
+        from create.lib.cui_installer import create_cui_installer as create
     else:
-        from create.lib.gui_installer import create
+        from create.lib.gui_installer import create_gui_installer as create
     setup = create(
         args.Script_File,
         name=args.output,

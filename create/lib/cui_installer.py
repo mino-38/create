@@ -1,7 +1,7 @@
 from create.lib.base import Create_Installer
 import subprocess
 
-class create(Create_Installer):
+class create_cui_installer(Create_Installer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
@@ -11,9 +11,9 @@ class create(Create_Installer):
         self.make_installer()
 
     def make_installer(self):
-        cmd = ["pyinstaller", "--onefile", self.name+".py"]
+        cmd = ["pyinstaller", "--clean", "--onefile", self.name+".py"]
         p = subprocess.run(cmd)
-        self.is_success(p)
+        self._is_success(p)
 
     def make_py_file(self):
         body = """import argparse

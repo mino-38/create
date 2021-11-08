@@ -14,16 +14,16 @@ class Create_Installer:
         self.console = console
         self.dist = None
         if run_exe:
-            self.run_exe()
+            self.make_exe()
 
-    def run_exe(self):
-        cmd = ["pyinstaller", self.path]
+    def make_exe(self):
+        cmd = ["pyinstaller", "--clean", self.path]
         self._is_success(subprocess.run(cmd))
         self.dist = "dist"
 
     def _is_success(self, p):
-        if p.return_code !=0:
-            sys.exit(p.return_code)
+        if p.returncode !=0:
+            sys.exit(p.returncode)
 
     def compress(self):
         target = self.dist if self.dist else self.path
