@@ -21,6 +21,7 @@ import os
 
 _file = os.path.abspath(sys.argv[0])
 FILES = {file_list}
+_yes = False
 
 def resource(path):
     if hasattr(sys, "_MEIPASS"):
@@ -28,13 +29,23 @@ def resource(path):
     else:
         return os.path.join(os.path.dirname(_file), path)
 
+def ask(path):
+    sub = tkinter.Toplevel()
+    sub.geometry("500x300")
+    label = ttk.Label(sub, text="'%s' has already exists\\ncan I overwrite?")
+    label.grid(column=0, row=0)
+    yes = ttk.Button(sub, text="yes", command=lambda: yes(sub))
+
+def yes(sub):
+    sub.destroy()
+
 def uncompress(frame, d, directory):
     with zipfile.ZipFile(resource("{zip_file}"), "r") as zip:
         for f in FILES:
             zip.extract(f, os.path.join(directory, f))
             p.set(p.get()+1)
     frame.destroy()
-    label = ttk.Label(root, text="Installing has already done\nYou can close this")
+    label = ttk.Label(root, text="Installing has already done\\nYou can close this")
     label.pack()
 
 def select_path(e):

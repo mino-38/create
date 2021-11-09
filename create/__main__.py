@@ -10,6 +10,7 @@ def argument():
     parser.add_argument("-o", "--output", default="")
     parser.add_argument("-c", "--cui", action="store_true")
     parser.add_argument("-e", "--exe", action="store_true")
+    parser.add_argument("--debug", action="store_true")
     parser.add_argument("--noconsole", action="store_false")
     parser.add_argument("--use-exe-library", choices=["pyinstaller", "cx_Freeze"], default="pyinstaller")
     return parser.parse_args()
@@ -28,7 +29,8 @@ def main():
         name=args.output,
         console=args.noconsole,
         run_exe=args.exe,
-        use_cmd=args.use_exe_library
+        use_cmd=args.use_exe_library,
+        debug=args.debug
     ) as installer:
         installer.run()
     print("\n\033[32mdone\033[0m")

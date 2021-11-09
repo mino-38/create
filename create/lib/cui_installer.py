@@ -12,15 +12,21 @@ class create_cui_installer(Create_Installer):
         self.make_installer(gui=False)
         
     def make_py_file(self):
+        if self.name.endswith("-installer"):
+            name = self.name.rstrip("installer").rstrip("-")
+        else:
+            name = self.name
         body = """import argparse
 import subprocess
 import zipfile
+import shutil
+import tqdm
 import sys
 import os
 
 _file = os.path.abspath(sys.argv[0])
-
-cmd = {cmd}
+_FILES = {files}
+_yes = False
 
 def _path(path):
     while not os.path.isfile(path):
@@ -29,6 +35,25 @@ def _path(path):
             sys.exit(1)
         path = os.path.join(os.path.dirname(os.path.dirname(path)), os.path.basename(path))
     return path
+
+def ask(path):
+    global _yes
+    s = _ask(path)
+    while s not in ["y", "n", "A"]:
+        s = _ask(path)
+    if s == "y":
+        return True
+    elif s == "n":
+        print("failed to install")
+        sys.exit(1)
+    else:
+        _yes = True
+        return _yes
+
+def _ask(path):
+    tqdm.tqdm.write("\\"%s\\" has already exists\\ncan I overwrite?[y/n/A] " % path, end="")
+    return sys.stdin.readline().strip()
+
 
 def resource(path):
     if hasattr(sys, "_MEIPASS"):
@@ -44,10 +69,18 @@ def uncompress(directory):
         os.mkdir(directory)
     os.chdir(directory)
     print("installing \\"{name}\\"... ")
-    cmd.append(resource("{zip_file}"))
-    p = subprocess.run(cmd)
-    if p.returncode != 0:
-        sys.exit(p.returncode)
+    with zipfile.ZipFile(resource("{zip_file}"), "r") as zip:
+        for f in tqdm.tqdm(_FILES):
+            if not os.path.isdir(os.path.dirname(f) or "."):
+                os.makedirs(os.path.dirname(f), exist_ok=True)
+            if os.path.exists(f):
+                if not _yes:
+                    ask(os.path.abspath(f))
+                if os.path.isfile(f):
+                    os.remove(f)
+                else:
+                    shutil.rmtree(f)
+            zip.extract(f)
 
 def argument():
     parser = argparse.ArgumentParser()
@@ -56,11 +89,16 @@ def argument():
 
 def main():
     args = argument()
-    uncompress(args.install_directory)
-    print("\\ndone.")
+    print("This is a '{name}' setupper\\nDo you want to install this in '%s'?" % os.path.abspath(args.install_directory))
+    s = sys.stdin.readline().rstrip()
+    while s not in ["y", "n", "Y", "N"]:
+        s = sys.stdin.readline()
+    if s in ["y", "Y"]:
+        uncompress(args.install_directory)
+        print("\\ndone.")
 
 if __name__== "__main__":
-    main()""".format(cmd=(["compact", "/u"] if self._is_win else ["unzip"]), zip_file=self.zip_file, files=self.files, name=self.name)
+    main()""".format(files=self.files, zip_file=self.zip_file, name=name)
         with open(self.name+".py", "w") as f:
             f.write(body)
         self._remove.append(self.name+".py")

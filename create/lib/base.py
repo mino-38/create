@@ -10,11 +10,12 @@ import os
 _cwd = os.getcwd()
 
 class Create_Installer:
-    def __init__(self, script_path, name, console, run_exe, use_cmd):
+    def __init__(self, script_path, name, console, run_exe, use_cmd, debug):
         self.path = script_path
         self.name = name or os.path.splitext(os.path.basename(os.path.abspath(self.path)))[0]+"-installer"
         self.console = console
         self.cmd = use_cmd
+        self.debug = debug
         self.dist = None
         self._remove = []
         self._is_win = platform.system() == "Windows"
@@ -40,19 +41,20 @@ class Create_Installer:
             sys.exit(p.returncode)
 
     def compress(self):
+        print()
         target = self.dist if self.dist else self.path
         os.chdir(target)
-        self.files = glob.glob("**", recursive=True)
+        self.files = [f for f in glob.glob("**", recursive=True) if os.path.isfile(f)]
         os.chdir(_cwd)
         self.zip_file = self.name+".zip"
-        with zipfile.ZipFile(self.zip_file, "w", compression=zipfile.ZIP_DEFLATED) as zip:
+        with zipfile.ZipFile(self.zip_file, "w", zipfile.ZIP_DEFLATED) as zip:
             for f in tqdm.tqdm(self.files, desc="compressing... ", leave=True, ascii=".#"):
                 zip.write(os.path.join(target, f), arcname=f)
         self._remove.append(self.zip_file)
 
     def make_installer(self, gui=True):
         print("\ncreating installer...")
-        cmd =self._build_cmd(self.name+".py", "--onefile", "--clean", "--add-data", "{zip}{join}{zip}".format(zip=self.zip_file, join=(";" if sys.platform == "win32" else ":")))
+        cmd = self._build_cmd(self.name+".py", "--onefile", "--clean", "--add-data", "{zip}{join}{zip}".format(zip=self.zip_file, join=(";" if sys.platform == "win32" else ":")))
         if self.cmd == "pyinstaller":
             if gui:
                 cmd.append("--noconsole")
@@ -80,5 +82,6 @@ class Create_Installer:
         return self
 
     def __exit__(self, *_):
-        for f in self._remove:
-            self._rm(f)
+        if not self.debug:
+            for f in self._remove:
+                self._rm(f)
