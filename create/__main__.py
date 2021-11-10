@@ -1,13 +1,14 @@
+from create.lib.create_parser import Parser
 import argparse
 import sys
 import os
 
-_file = os.path.abspath(sys.argv[0])
+SPEC = "SPEC.cfg"
 
 def argument():
     parser = argparse.ArgumentParser()
-    parser.add_argument("Script_File", default=os.path.join(os.path.dirname(_file),"__main__.py"))
-    parser.add_argument("-o", "--output", default="")
+    parser.add_argument("Script_File", nargs="?", default=os.path.join(os.getcwd(), "SPEC.cfg"))
+    parser.add_argument("-o", "--output-name", default="")
     parser.add_argument("-c", "--cui", action="store_true")
     parser.add_argument("-e", "--exe", action="store_true")
     parser.add_argument("--debug", action="store_true")
@@ -20,13 +21,15 @@ def main():
     if not os.path.exists(args.Script_File):
         print("{} does not exists".format(args.Script_File))
         return 1
+    if args.Script_File.endswith(SPEC):
+        args = Parser(SPEC).parse(args.debug)
     if args.cui:
         from create.lib.cui_installer import create_cui_installer as create
     else:
         from create.lib.gui_installer import create_gui_installer as create
     with create(
         args.Script_File,
-        name=args.output,
+        name=args.output_name,
         console=args.noconsole,
         run_exe=args.exe,
         use_cmd=args.use_exe_library,

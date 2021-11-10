@@ -54,9 +54,8 @@ def ask(path):
         return _yes
 
 def _ask(path):
-    tqdm.tqdm.write("\\"%s\\" has already exists\\ncan I overwrite?[y/n/A] " % path, end="")
+    tqdm.tqdm.write("\\"%s\\" has already exists\\ncan I overwrite?[y/n/A]\\n" % path, end="")
     return sys.stdin.readline().strip()
-
 
 def resource(path):
     if hasattr(sys, "_MEIPASS"):
@@ -84,6 +83,7 @@ def uncompress(directory):
                 else:
                     shutil.rmtree(f)
             zip.extract(f)
+            tqdm.tqdm.write("create '%s'" % os.path.abspath(f))
 
 def argument():
     parser = argparse.ArgumentParser()
@@ -107,7 +107,7 @@ def main(title=True):
         uncompress(args.install_directory)
         print("\\ndone.")
     elif s in ["c", "change"]:
-        print("Please enter the installing to directory")
+        print("Please enter the installing to directory\\n> ", end="")
         dir = sys.stdin.readline().rstrip()
         sys.argv = [sys.argv[0], "-d", dir]
         main(title=False)
