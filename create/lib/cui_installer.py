@@ -1,5 +1,6 @@
 from create.lib.base import Create_Installer
 import subprocess
+import shutil
 import sys
 
 class create_cui_installer(Create_Installer):
@@ -8,6 +9,8 @@ class create_cui_installer(Create_Installer):
     
     def run(self):
         self.compress()
+        if self.run_exe:
+            shutil.rmtree("dist")
         self.make_py_file()
         self.make_installer(gui=False)
         
@@ -87,15 +90,27 @@ def argument():
     parser.add_argument("-d", "--install-directory", nargs="?", default=".")
     return parser.parse_args()
 
-def main():
+def main(title=True):
     args = argument()
-    print("This is a '{name}' setupper\\nDo you want to install this in '%s'?" % os.path.abspath(args.install_directory))
-    s = sys.stdin.readline().rstrip()
-    while s not in ["y", "n", "Y", "N"]:
-        s = sys.stdin.readline()
-    if s in ["y", "Y"]:
+    if title:
+        print("This is a '{name}' setupper\\nDo you want to install this in '%s'?" % os.path.abspath(args.install_directory))
+    else:
+        print("Do you want to install this in '%s'?" % os.path.abspath(args.install_directory))
+    print("[y/n/C] ", end="")
+    sys.stdout.flush()
+    s = sys.stdin.readline().rstrip().lower()
+    while s not in ["y", "n", "c", "yes", "no", "change"]:
+        print("[y/n/C] ", end="")
+        sys.stdout.flush()
+        s = sys.stdin.readline().rstrip().lower()
+    if s in ["y", "yes"]:
         uncompress(args.install_directory)
         print("\\ndone.")
+    elif s in ["c", "change"]:
+        print("Please enter the installing to directory")
+        dir = sys.stdin.readline().rstrip()
+        sys.argv = [sys.argv[0], "-d", dir]
+        main(title=False)
 
 if __name__== "__main__":
     main()""".format(files=self.files, zip_file=self.zip_file, name=name)

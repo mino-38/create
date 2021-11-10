@@ -1,5 +1,6 @@
 from create.lib.base import Create_Installer
 import subprocess
+import shutil
 
 class create_gui_installer(Create_Installer):
     def __init__(self, *args, **kwargs):
@@ -7,6 +8,8 @@ class create_gui_installer(Create_Installer):
 
     def run(self):
         self.compress()
+        if self.run_exe:
+            shutil.rmtree("dist")
         self.make_py_file()
         self.make_installer()
 
@@ -15,13 +18,15 @@ class create_gui_installer(Create_Installer):
 from tkinter import ttk
 import tkinter
 import zipfile
+import shutil
 import tpdm
 import sys
 import os
 
 _file = os.path.abspath(sys.argv[0])
 FILES = {file_list}
-_yes = False
+_all_yes = False
+
 
 def resource(path):
     if hasattr(sys, "_MEIPASS"):
@@ -30,18 +35,48 @@ def resource(path):
         return os.path.join(os.path.dirname(_file), path)
 
 def ask(path):
+    global yes
+    yes = False
     sub = tkinter.Toplevel()
     sub.geometry("500x300")
     label = ttk.Label(sub, text="'%s' has already exists\\ncan I overwrite?")
     label.grid(column=0, row=0)
-    yes = ttk.Button(sub, text="yes", command=lambda: yes(sub))
+    yes_bt = ttk.Button(sub, text="Yes", command=lambda: on_yes(sub))
+    yes_bt.grid(column=0, row=1)
+    no_bt = ttk.Button(sub, text="No", command=lambda: on_no(sub))
+    no_bt.grid(column=1, row=1)
+    all_yes_bt = ttk.Button(sub, text="All Yes", command=lambda: on_all_yes(sub))
+    all_yes_bt.grid(column=2, row=1)
+    while not yes:
+        pass
 
-def yes(sub):
+def on_yes(sub):
+    global yes
+    yes = True
     sub.destroy()
+
+def on_no(sub):
+    on_yes(sub)
+    sys.exit(1)
+
+def on_all_yes(sub):
+    global _all_yes
+    on_yes(sub)
+    _all_yes = True
+
+def _remove(path):
+    if os.path.isfile(path):
+        os.remove(path)
+    else:
+        shutil.rmtree(path)
 
 def uncompress(frame, d, directory):
     with zipfile.ZipFile(resource("{zip_file}"), "r") as zip:
         for f in FILES:
+            if os.path.exists(f):
+                if not _all_yes:
+                    ask(os.path.abspath(f))
+                _remove(f)
             zip.extract(f, os.path.join(directory, f))
             p.set(p.get()+1)
     frame.destroy()

@@ -15,6 +15,7 @@ class Create_Installer:
         self.name = name or os.path.splitext(os.path.basename(os.path.abspath(self.path)))[0]+"-installer"
         self.console = console
         self.cmd = use_cmd
+        self.run_exe = run_exe
         self.debug = debug
         self.dist = None
         self._remove = []
