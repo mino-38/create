@@ -19,7 +19,7 @@ from tkinter import ttk
 import tkinter
 import zipfile
 import shutil
-import tpdm
+import tqdm
 import sys
 import os
 

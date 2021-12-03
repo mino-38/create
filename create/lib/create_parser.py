@@ -25,7 +25,7 @@ class Data:
 
     @property
     def exe(self):
-        return True if self.Script_File.endswith(".py") else False
+        return self.Script_File.endswith(".py")
 
 class Parser:
     def __init__(self, path):
