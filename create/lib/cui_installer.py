@@ -74,7 +74,7 @@ def uncompress(directory):
         os.mkdir(directory)
     os.chdir(directory)
     print("installing \\"{name}\\"... ")
-    with tempfile.TemporaryFile("wb") as tmp:
+    with tempfile.NamedTemporaryFile("wb") as tmp:
         tmp.write({zip_byte})
         with zipfile.ZipFile(tmp.name) as zip:
             for f in tqdm.tqdm(_FILES):
