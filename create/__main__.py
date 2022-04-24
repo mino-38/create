@@ -10,6 +10,7 @@ def argument():
     parser.add_argument("Script_File", nargs="?", default=os.path.join(os.getcwd(), "SPEC.cfg"))
     parser.add_argument("-o", "--output-name", default="")
     parser.add_argument("-c", "--cui", action="store_true")
+    parser.add_argument("--onefile", action="store_true")
     parser.add_argument("-e", "--exe", action="store_true")
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--noconsole", action="store_false")
@@ -30,6 +31,7 @@ def main():
     with create(
         args.Script_File,
         name=args.output_name,
+        onefile=args.onefile,
         console=args.noconsole,
         run_exe=args.exe,
         use_cmd=args.use_exe_library,
