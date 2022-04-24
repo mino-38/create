@@ -10,9 +10,10 @@ import os
 _cwd = os.getcwd()
 
 class Create_Installer:
-    def __init__(self, script_path, name, console, run_exe, use_cmd, debug):
+    def __init__(self, script_path, name, onefile, console, run_exe, use_cmd, debug):
         self.path = script_path
         self.name = name or os.path.splitext(os.path.basename(os.path.abspath(self.path)))[0]+"-installer"
+        self.create_as_onefile = onefile
         self.console = console
         self.cmd = use_cmd
         self.run_exe = run_exe
@@ -55,12 +56,14 @@ class Create_Installer:
 
     def make_installer(self, gui=True):
         print("\ncreating installer...")
-        cmd = self._build_cmd(self.name+".py", "--onefile", "--clean")
+        cmd = self._build_cmd(self.name+".py", "--clean")
         if self.cmd == "pyinstaller":
             if gui:
                 cmd.append("--noconsole")
                 if self._is_win:
                     cmd.append("--windowed")
+            if self.create_as_onefile:
+                cmd.append("--onefile")
         p = subprocess.run(cmd)
         self._is_success(p)
         self._remove.append("build")
