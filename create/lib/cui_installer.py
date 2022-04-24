@@ -19,7 +19,7 @@ class create_cui_installer(Create_Installer):
             name = self.name.rstrip("installer").rstrip("-")
         else:
             name = self.name
-        with open(self.zip_file, "r") as f:
+        with open(self.zip_file, "rb") as f:
             zip_byte = f.read()
         body = """import argparse
 import subprocess
@@ -76,7 +76,7 @@ def uncompress(directory):
     print("installing \\"{name}\\"... ")
     with tempfile.TemporaryFile("wb") as tmp:
         tmp.write({zip_byte})
-        with zipfile.ZipFile(tmp.name, "r") as zip:
+        with zipfile.ZipFile(tmp.name) as zip:
             for f in tqdm.tqdm(_FILES):
                 if not os.path.isdir(os.path.dirname(f) or "."):
                     os.makedirs(os.path.dirname(f), exist_ok=True)
