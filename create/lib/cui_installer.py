@@ -76,7 +76,7 @@ def uncompress(directory):
     print("installing \\"{name}\\"... ")
     with tempfile.TemporaryFile("wb") as tmp:
         tmp.write({zip_byte})
-        with zipfile.ZipFile(tmp, "r") as zip:
+        with zipfile.ZipFile(tmp.name, "r") as zip:
             for f in tqdm.tqdm(_FILES):
                 if not os.path.isdir(os.path.dirname(f) or "."):
                     os.makedirs(os.path.dirname(f), exist_ok=True)
