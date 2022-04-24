@@ -9,12 +9,12 @@ def argument():
     parser = argparse.ArgumentParser()
     parser.add_argument("Script_File", nargs="?", default=os.path.join(os.getcwd(), "SPEC.cfg"))
     parser.add_argument("-o", "--output-name", default="")
-    parser.add_argument("-c", "--cui", action="store_true")
-    parser.add_argument("--onefile", action="store_true")
-    parser.add_argument("-e", "--exe", action="store_true")
+    parser.add_argument("-g ", "--gui", action="store_true", help="create installer for cui")
+    parser.add_argument("--onefile", action="store_true", help="create onefile installer. This option work only pyinstaller")
+    parser.add_argument("-e", "--exe", action="store_true", help="First, become the .py file specified the argument executable file and create installer")
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--noconsole", action="store_false")
-    parser.add_argument("--use-exe-library", choices=["pyinstaller", "cx_Freeze"], default="pyinstaller")
+    parser.add_argument("--use-exe-library", choices=["pyinstaller", "cx_Freeze"], default="pyinstaller", help="Library used for creating executable file")
     return parser.parse_args()
 
 def main():
@@ -24,10 +24,12 @@ def main():
         return 1
     if args.Script_File.endswith(SPEC):
         args = Parser(SPEC).parse(args.debug)
-    if args.cui:
-        from create.lib.cui_installer import create_cui_installer as create
-    else:
+    if args.gui:
+        print("Sorry, but installer for gui is developping", file=sys.stderr)
+        sys.exit(1)
         from create.lib.gui_installer import create_gui_installer as create
+    else:
+        from create.lib.cui_installer import create_cui_installer as create
     with create(
         args.Script_File,
         name=args.output_name,
