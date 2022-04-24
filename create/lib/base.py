@@ -67,8 +67,6 @@ class Create_Installer:
         p = subprocess.run(cmd)
         self._is_success(p)
         self._remove.append("build")
-        if self.cmd == "cx_Freeze":
-            shutil.move(self.zip_file, os.path.join("dist", self.zip_file))
 
     def _rm(self, path):
         if os.path.isfile(path):
