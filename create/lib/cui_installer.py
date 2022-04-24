@@ -19,8 +19,11 @@ class create_cui_installer(Create_Installer):
             name = self.name.rstrip("installer").rstrip("-")
         else:
             name = self.name
+        with open(self.zip_file, "r") as f:
+            zip_byte = f.read()
         body = """import argparse
 import subprocess
+import tempfile
 import zipfile
 import shutil
 import tqdm
@@ -71,19 +74,21 @@ def uncompress(directory):
         os.mkdir(directory)
     os.chdir(directory)
     print("installing \\"{name}\\"... ")
-    with zipfile.ZipFile(resource("{zip_file}"), "r") as zip:
-        for f in tqdm.tqdm(_FILES):
-            if not os.path.isdir(os.path.dirname(f) or "."):
-                os.makedirs(os.path.dirname(f), exist_ok=True)
-            if os.path.exists(f):
-                if not _yes:
-                    ask(os.path.abspath(f))
-                if os.path.isfile(f):
-                    os.remove(f)
-                else:
-                    shutil.rmtree(f)
-            zip.extract(f)
-            tqdm.tqdm.write("create '%s'" % os.path.abspath(f))
+    with tempfile.TemporaryFile("wb") as tmp:
+        tmp.write({zip_byte})
+        with zipfile.ZipFile(tmp, "r") as zip:
+            for f in tqdm.tqdm(_FILES):
+                if not os.path.isdir(os.path.dirname(f) or "."):
+                    os.makedirs(os.path.dirname(f), exist_ok=True)
+                if os.path.exists(f):
+                    if not _yes:
+                        ask(os.path.abspath(f))
+                    if os.path.isfile(f):
+                        os.remove(f)
+                    else:
+                        shutil.rmtree(f)
+                zip.extract(f)
+                tqdm.tqdm.write("create '%s'" % os.path.abspath(f))
 
 def argument():
     parser = argparse.ArgumentParser()
@@ -113,7 +118,8 @@ def main(title=True):
         main(title=False)
 
 if __name__== "__main__":
-    main()""".format(files=self.files, zip_file=self.zip_file, name=name)
+    main()""".format(files=self.files, zip_byte=zip_byte, name=name)
         with open(self.name+".py", "w") as f:
             f.write(body)
         self._remove.append(self.name+".py")
+        self._remove.append(self.zip_file)
