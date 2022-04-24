@@ -55,7 +55,7 @@ class Create_Installer:
 
     def make_installer(self, gui=True):
         print("\ncreating installer...")
-        cmd = self._build_cmd(self.name+".py", "--onefile", "--clean", "--add-data", "{zip}{join}{zip}".format(zip=self.zip_file, join=(";" if sys.platform == "win32" else ":")))
+        cmd = self._build_cmd(self.name+".py", "--onefile", "--clean")
         if self.cmd == "pyinstaller":
             if gui:
                 cmd.append("--noconsole")
