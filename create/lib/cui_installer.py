@@ -122,4 +122,3 @@ if __name__== "__main__":
         with open(self.name+".py", "w") as f:
             f.write(body)
         self._remove.append(self.name+".py")
-        self._remove.append(self.zip_file)
