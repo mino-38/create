@@ -26,7 +26,7 @@ class Create_Installer:
 
     def _build_cmd(self, file, *args):
         if self.cmd == "pyinstaller":
-            cmd = ["pyinstaller", file, "--specpath", os.devnull]
+            cmd = ["pyinstaller", file]
             cmd.extend(list(args))
         else:
             cmd = ["cxfreeze", "-c", file, "--target-dir", "dist"]
